@@ -174,3 +174,41 @@ body{
   .input { padding: 12px; }
   .send-btn { width: 44px; height: 44px; }
 }
+
+/* --- NOVOS ESTILOS PARA ÍCONES PNG --- */
+
+/* Estilo para os novos ícones <img> nos botões de navegação */
+.nav-btn img.nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  opacity: 0.7; /* Ícones inativos ficam um pouco apagados */
+  transition: opacity 0.2s, filter 0.2s;
+  
+  /* Sobrescreve a cor do SVG, que não se aplica a <img> */
+  color: unset; 
+}
+
+/* Faz o ícone ativo ficar mais brilhante */
+.nav-btn.active img.nav-icon {
+  opacity: 1;
+  /* Adiciona um leve brilho verde no ícone ativo */
+  filter: drop-shadow(0 0 3px var(--accent));
+}
+
+/* Estilo para os ícones nos botões pequenos (header/footer) */
+.small-btn img.nav-icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.8;
+  color: unset;
+}
+
+/* Estilo para o ícone de créditos */
+.credits img.credits-icon {
+   width: 16px; 
+   height: 16px;
+   margin-right: 4px; /* Espaçamento do texto */
+   opacity: 0.9;
+}
+/* --- FIM DOS NOVOS ESTILOS --- */
