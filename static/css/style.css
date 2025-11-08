@@ -1,0 +1,176 @@
+:root{
+  --bg:#162b26;
+  --panel:#0f2420;
+  --muted:#9fbfb0;
+  --accent:#2edda8;
+  --glass: rgba(255,255,255,0.03);
+  --bubble-user: linear-gradient(180deg, rgba(20,95,80,1), rgba(16,80,68,1));
+  --bubble-bot: rgba(255,255,255,0.03);
+  --radius:16px;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body,#app{height:100%}
+body{
+  background: radial-gradient(circle at 10% 10%, rgba(46,221,168,0.03), transparent 10%),
+              linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.1)),
+              var(--bg);
+  color:var(--muted);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+  padding:20px;
+}
+
+/* App layout */
+.nebula-app{
+  width:100%;
+  max-width:1200px;
+  height:calc(100vh - 40px);
+  display:grid;
+  grid-template-columns:260px 1fr;
+  gap:18px;
+  align-items:stretch;
+}
+
+/* Sidebar */
+.nebula-sidebar{
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
+  border-radius:14px;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  min-height:0;
+}
+.nebula-logo-wrap{display:flex;gap:12px;align-items:center}
+#nebula-logo{flex:0 0 40px}
+.nebula-title{font-weight:700;color:var(--accent);letter-spacing:0.6px;font-size:20px}
+
+/* Nav (Estilos adicionados para ícones) */
+.sidebar-nav{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.nav-btn{
+  background:transparent;
+  border:0;
+  color:var(--muted);
+  padding:10px;
+  border-radius:10px;
+  text-align:left;
+  cursor:pointer;
+  /* Novas propriedades flex para alinhar ícone e texto */
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight: 500;
+}
+.nav-btn svg {
+  width: 20px;
+  height: 20px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.nav-btn.active{background:var(--glass);color:var(--accent)}
+.nav-btn.active svg {
+  color: var(--accent);
+}
+
+/* Footer (Estilos atualizados para ícones) */
+.sidebar-footer{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.credits{font-weight:700;color:var(--accent);display:flex;align-items:center;gap:8px; font-size: 14px; padding: 8px 0;}
+.small-btn{
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.03);
+  color:var(--muted);
+  border-radius:10px;
+  cursor:pointer;
+  /* Ajustes para botões de ícone */
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.small-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Main */
+.nebula-main{display:flex;flex-direction:column;gap:12px;height:100%}
+.main-header{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 12px;border-radius:12px;background:transparent}
+.hdr-title{color:#fff;font-size:20px;font-weight:700}
+.hdr-sub{color:var(--muted);font-size:13px;margin-top:4px}
+
+/* Chat area */
+.chat-container{background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02)); padding:18px;border-radius:12px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.messages{flex:1;overflow:auto;padding-right:12px;display:flex;flex-direction:column;gap:12px}
+.typing{display:none;align-items:center;gap:10px;font-size:13px;color:var(--muted);opacity:0.95}
+.typing .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:6px;opacity:0.9;animation:blink 1s infinite}
+
+@keyframes blink{0%{opacity:0.2}50%{opacity:1}100%{opacity:0.2}}
+
+/* Messages */
+.message-group{display:flex;gap:12px;align-items:flex-end;max-width:75%;}
+.message-group .avatar{width:40px;height:40px;border-radius:10px;background:linear-gradient(180deg,#1a7f69,#145a47);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#021a1a;font-weight:700; font-size: 18px;}
+.message-group.user{margin-left:auto;flex-direction:row-reverse}
+.message-group.user .avatar{background:linear-gradient(180deg,#2b9f8b,#21735b);color:#021a1a}
+.bubble{background:var(--bubble-bot);padding:14px 18px;border-radius:14px;box-shadow: 0 6px 18px rgba(0,0,0,0.6)}
+
+/* user bubble override */
+.message-group.user .bubble{background:linear-gradient(180deg, rgba(46,221,168,0.18), rgba(46,221,168,0.1));color:#eafaf5}
+
+/* bubble content */
+.bubble-inner{white-space:pre-wrap;line-height:1.5;color:var(--muted)}
+.message-group.user .bubble-inner { color: #fff; } /* Texto do usuário mais claro */
+
+/* input */
+.chat-form{display:block;padding:12px;border-radius:12px;background:transparent}
+.input-row{display:flex;gap:8px}
+.input{flex:1;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);background:rgba(255,255,255,0.02);color:#fff;outline:none; font-size: 15px;}
+.input::placeholder { color: var(--muted); opacity: 0.7;}
+
+.send-btn{
+  background:linear-gradient(180deg,var(--accent), #1aa67d);
+  border:0;
+  padding:0; /* Ajustado para ícone */
+  width: 48px; /* Largura fixa */
+  height: 48px; /* Altura fixa */
+  border-radius:12px;
+  color:#021a1a;
+  font-weight:700;
+  cursor:pointer;
+  /* Centralizando o ícone */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.send-btn svg {
+  margin-left: 2px; /* Pequeno ajuste visual */
+}
+
+/* responsive */
+@media (max-width:900px){
+  body { padding: 10px; }
+  .nebula-app{grid-template-columns:1fr;max-width:720px;height:calc(100vh - 20px); gap: 10px;}
+  .nebula-sidebar{display:flex;flex-direction:row;align-items:center;gap:10px;padding:10px;border-radius:10px}
+  /* Oculta texto dos botões da nav em telas pequenas */
+  .sidebar-nav span { display: none; }
+  .nav-btn { gap: 0; justify-content: center; width: 40px; height: 40px; padding: 8px;}
+  .sidebar-footer { margin-left: auto; margin-top: 0; flex-direction: row; gap: 6px; }
+  .credits { display: none; } /* Oculta créditos em telas pequenas */
+  
+  .nebula-main{padding:0; gap: 8px;}
+  .main-header { padding: 10px 14px; }
+  .chat-container { padding: 12px; }
+  .messages{padding:8px; gap: 10px;}
+  .message-group{max-width:90%} /* Mensagens podem ser um pouco mais largas */
+  .chat-form { padding: 8px; }
+  .input { padding: 12px; }
+  .send-btn { width: 44px; height: 44px; }
+}
