@@ -11,56 +11,86 @@
   <div class="nebula-app" id="app">
     <aside class="nebula-sidebar">
       <div class="nebula-logo-wrap">
-        <svg id="nebula-logo" width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg id="nebula-logo" width="56" height="56" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
-            <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
-              <stop offset="65%" stop-color="#2edda8" stop-opacity="0.95"/>
-              <stop offset="100%" stop-color="#1aa67d" stop-opacity="0.95"/>
+            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+              <stop offset="50%" stop-color="#2edda8" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#1aa67d" stop-opacity="1"/>
             </linearGradient>
-            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+            <linearGradient id="logoGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#2edda8" stop-opacity="0.8"/>
+              <stop offset="100%" stop-color="#1aa67d" stop-opacity="0.6"/>
+            </linearGradient>
+            <filter id="logoGlowFilter" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
               <feMerge>
                 <feMergeNode in="coloredBlur"/>
                 <feMergeNode in="SourceGraphic"/>
               </feMerge>
             </filter>
+            <filter id="logoShadow">
+              <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#2edda8" flood-opacity="0.4"/>
+            </filter>
           </defs>
-          <g filter="url(#glow)">
-            <circle cx="50" cy="50" r="38" fill="url(#g1)"></circle>
-            <path d="M30 65 C42 85, 58 85, 70 65 C78 54, 78 46, 70 35 C58 15, 42 15, 30 35 C22 46, 22 54, 30 65 Z" fill="#021a1a" opacity="0.05"></path>
-            <text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="36" fill="#021a1a">N</text>
+          <g filter="url(#logoGlowFilter) url(#logoShadow)">
+            <circle cx="50" cy="50" r="42" fill="url(#logoGradient)"/>
+            <circle cx="50" cy="50" r="38" fill="url(#logoGradient)" opacity="0.95"/>
+            <path d="M28 62 C42 85, 58 85, 72 62 C80 50, 80 40, 72 28 C58 10, 42 10, 28 28 C20 40, 20 50, 28 62 Z" fill="#021a1a" opacity="0.08"/>
+            <text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="42" fill="#021a1a" opacity="0.95">N</text>
           </g>
         </svg>
-        <div class="nebula-title">Nebula</div>
+        <div class="nebula-title">
+          <span class="nebula-title-main">Nebula</span>
+          <span class="nebula-title-sub">Agent v6.0</span>
+        </div>
       </div>
 
       <nav class="sidebar-nav">
         <button class="nav-btn active" data-view="chat">
-          <img src="/static/img/icons/chat.PNG" alt="Chat" class="nav-icon">
+          <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
           <span>Chat</span>
         </button>
         <button class="nav-btn" data-view="history">
-          <img src="/static/img/icons/All_tasks.PNG" alt="Histórico" class="nav-icon">
+          <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
           <span>Histórico</span>
         </button>
         <button class="nav-btn" data-view="scrumban">
-          <img src="/static/img/icons/Agente.PNG" alt="Scrumban" class="nav-icon">
+          <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
           <span>Scrumban</span>
         </button>
         <button class="nav-btn" data-view="settings">
-          <img src="/static/img/icons/Connect_apps.PNG" alt="Configurações" class="nav-icon">
+          <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364l-4.243-4.243m-4.242 0L5.636 17.364m12.728 0l-4.243-4.243m-4.242 0L5.636 6.636"></path>
+          </svg>
           <span>Configurações</span>
         </button>
       </nav>
 
       <div class="sidebar-footer">
         <div class="credits" id="credits">
-          <img src="/static/img/icons/Credits.PNG" alt="Créditos" class="credits-icon">
-          <span>Créditos: --</span>
+          <svg class="credits-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          <span>Créditos: <strong id="creditsValue">--</strong></span>
         </div>
-        <button id="clearLocal" class="small-btn" aria-label="Limpar chat">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+        <button id="clearLocal" class="small-btn" aria-label="Limpar chat" title="Limpar histórico">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"></path>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
         </button>
       </div>
     </aside>
@@ -68,12 +98,31 @@
     <main class="nebula-main">
       <header class="main-header">
         <div class="header-left">
-          <h1 class="hdr-title">Nebula</h1>
-          <p class="hdr-sub">Sua assistente de IA. Analises, automações e suporte técnico.</p>
+          <div class="header-logo-title">
+            <svg class="header-logo" width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="headerLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+                  <stop offset="50%" stop-color="#2edda8" stop-opacity="1"/>
+                  <stop offset="100%" stop-color="#1aa67d" stop-opacity="1"/>
+                </linearGradient>
+              </defs>
+              <circle cx="50" cy="50" r="38" fill="url(#headerLogoGradient)"/>
+              <text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="32" fill="#021a1a" opacity="0.95">N</text>
+            </svg>
+            <div>
+              <h1 class="hdr-title">Nebula Agent</h1>
+              <p class="hdr-sub">Sua assistente de IA especializada em testes e automação BDD</p>
+            </div>
+          </div>
         </div>
         <div class="header-right">
-          <button id="toggleHistory" class="small-btn" aria-label="Alternar histórico">
-            <img src="/static/img/icons/Close_sidebar.PNG" alt="Alternar Histórico" class="nav-icon">
+          <button id="toggleHistory" class="small-btn" aria-label="Alternar histórico" title="Alternar histórico">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
           </button>
         </div>
       </header>

@@ -1,6 +1,36 @@
 # Changelog - Nebula Agent v6.0
 
-## Bug Fixes (Latest)
+## Major Improvements - Professional Design & Functionality (Latest Update)
+
+### 🎨 Visual Design Overhaul
+- **Logo Destacada**: Logo maior (56px) com animação sutil de pulso e efeito glow
+- **Design Profissional**: Interface completamente redesenhada com gradientes, sombras e efeitos modernos
+- **Ícones SVG Profissionais**: Substituídos ícones PNG por SVG inline de alta qualidade
+- **Animações Suaves**: Transições e animações em todos os elementos interativos
+- **Cores Vibrantes**: Paleta de cores aprimorada com gradientes e efeitos de brilho
+- **Header Melhorado**: Logo também no header principal para maior visibilidade
+
+### 🚀 Funcionalidades do Agente
+- **Fallback ML**: Agente funciona mesmo sem OpenAI API Key (usa motor ML local)
+- **Markdown Rendering**: Suporte completo a markdown nas respostas (código, negrito, links, etc.)
+- **Melhor UX**: Indicadores de digitação, animações de mensagens, scroll suave
+- **Tratamento de Erros**: Mensagens de erro mais informativas e úteis
+- **Créditos em Tempo Real**: Exibição atualizada de créditos após cada interação
+
+### 🎯 Melhorias de Interface
+- **Navegação Aprimorada**: Botões de navegação com hover effects e indicadores visuais
+- **Input Melhorado**: Campo de input com focus states e animações
+- **Botão de Envio**: Botão destacado com efeito hover e animação
+- **Mensagens**: Bubbles com melhor contraste e legibilidade
+- **Responsivo**: Design totalmente responsivo para mobile e desktop
+
+### 🛠️ Código e Performance
+- **JavaScript Otimizado**: Código limpo, organizado e com tratamento de erros robusto
+- **CSS Moderno**: Uso de variáveis CSS, gradientes, backdrop-filter e animações CSS
+- **API Melhorada**: Endpoint `/chat` funciona com ou sem LLM
+- **Logging**: Melhor logging e debug de erros
+
+## Bug Fixes (Previous)
 
 ### Static File Paths (Fixed)
 - **Issue**: `index.html` was referencing CSS and JS files without the proper `/static/` path prefix

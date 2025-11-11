@@ -1,127 +1,323 @@
-// Espera o DOM carregar para começar a executar o script
-document.addEventListener("DOMContentLoaded", () => {
+// ============================================
+// NEBULA AGENT v6.0 - Professional Chat Interface
+// ============================================
+
+// Configuração da API
+const API_BASE_URL = window.location.origin;
+
+// Elementos da interface
+const messagesEl = document.getElementById("messages");
+const typingEl = document.getElementById("typing");
+const inputEl = document.getElementById("inputMsg");
+const formEl = document.getElementById("chatForm");
+const creditsEl = document.getElementById("credits");
+const creditsValueEl = document.getElementById("creditsValue");
+const clearLocalBtn = document.getElementById("clearLocal");
+
+let history = [];
+let isProcessing = false;
+
+// ============================================
+// UTILITIES
+// ============================================
+
+function saveHistory() {
+  try {
+    localStorage.setItem("nebula_history_v1", JSON.stringify(history));
+  } catch (e) {
+    console.warn("localStorage error:", e);
+  }
+}
+
+function loadHistory() {
+  try {
+    const data = localStorage.getItem("nebula_history_v1");
+    history = data ? JSON.parse(data) : [];
+  } catch (e) {
+    history = [];
+  }
+}
+
+function formatTime(ts) {
+  const d = new Date(ts || Date.now());
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+// ============================================
+// MARKDOWN PARSER
+// ============================================
+
+function parseMarkdown(text) {
+  if (!text) return '';
   
-  // Seleciona os elementos principais da interface
-  const chatForm = document.getElementById("chatForm");
-  const inputMsg = document.getElementById("inputMsg");
-  const sendBtn = document.getElementById("sendBtn");
-  const messagesContainer = document.getElementById("messages");
-  const typingIndicator = document.getElementById("typing");
-  const messageTemplate = document.getElementById("msg-template");
-  const clearChatBtn = document.getElementById("clearLocal");
-  const navButtons = document.querySelectorAll(".nav-btn");
+  let html = text;
+  
+  // Code blocks
+  html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+  
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  
+  // Bold
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+  
+  // Italic
+  html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  html = html.replace(/_([^_]+)_/g, '<em>$1</em>');
+  
+  // Links
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  
+  // Line breaks
+  html = html.replace(/\n/g, '<br>');
+  
+  return html;
+}
 
-  // Função para rolar o chat para a última mensagem
-  function scrollToBottom() {
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-  }
+// ============================================
+// RENDER MESSAGES
+// ============================================
 
-  // Função para criar e adicionar uma nova mensagem (seja do usuário ou do bot)
-  function createMessage(text, sender) {
-    // Clona o template de mensagem
-    const templateClone = messageTemplate.content.cloneNode(true);
-    const messageGroup = templateClone.querySelector(".message-group");
-    const avatar = templateClone.querySelector(".avatar");
-    const bubbleInner = templateClone.querySelector(".bubble-inner");
-
-    // Define o conteúdo e o remetente
+function appendMessage({ role = 'assistant', text = '', ts = Date.now(), temp = false }) {
+  const tpl = document.getElementById("msg-template");
+  const node = tpl.content.cloneNode(true);
+  const group = node.querySelector(".message-group");
+  const avatar = node.querySelector(".avatar");
+  const bubbleInner = node.querySelector(".bubble-inner");
+  
+  // Parse markdown for bot messages
+  if (role === 'assistant') {
+    bubbleInner.innerHTML = parseMarkdown(text);
+  } else {
     bubbleInner.textContent = text;
-    
-    if (sender === "user") {
-      messageGroup.classList.add("user");
-      avatar.textContent = "U"; // Você pode mudar para a inicial do usuário
+  }
+  
+  avatar.textContent = role === 'user' ? 'U' : 'N';
+  
+  if (role === 'user') {
+    group.classList.add("user");
+  } else {
+    group.classList.add("bot");
+  }
+  
+  messagesEl.appendChild(node);
+  scrollToBottom();
+  
+  return group;
+}
+
+function setTyping(on = true) {
+  typingEl.style.display = on ? 'flex' : 'none';
+  if (on) {
+    scrollToBottom();
+  }
+}
+
+function scrollToBottom() {
+  messagesEl.scrollTop = messagesEl.scrollHeight - messagesEl.clientHeight + 100;
+}
+
+// ============================================
+// API FUNCTIONS
+// ============================================
+
+async function fetchCredits() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/billing/status`);
+    if (res.ok) {
+      const data = await res.json();
+      const credits = data.credits ?? 0;
+      creditsValueEl.textContent = credits;
+      return credits;
     } else {
-      avatar.textContent = "N"; // 'N' de Nebula
+      creditsValueEl.textContent = '--';
+      return null;
     }
-
-    // Adiciona a mensagem ao container e rola para baixo
-    messagesContainer.appendChild(templateClone);
-    scrollToBottom();
+  } catch (e) {
+    console.error("Error fetching credits:", e);
+    creditsValueEl.textContent = '--';
+    return null;
   }
+}
 
-  // (Função getBotResponse removida, pois não é mais necessária)
-
-  // 
-  // ESTA É A FUNÇÃO ATUALIZADA
-  // 
-  // Função principal para lidar com o envio de mensagens
-  async function handleChatSubmit(event) {
-    event.preventDefault(); // Impede o recarregamento da página
-    
-    const userText = inputMsg.value.trim();
-    if (userText === "") return; // Não envia mensagens vazias
-
-    // 
-    // ⚠️ MUDE ESSA LINHA com a URL do seu backend do Render
-    // 
-    const backendUrl = 'https://seu-backend.onrender.com/api/chat';
-
-    // 1. Adiciona a mensagem do usuário à interface
-    createMessage(userText, "user");
-
-    // 2. Limpa o campo de input
-    inputMsg.value = "";
-
-    // 3. Mostra o indicador "digitando"
-    typingIndicator.style.display = "flex";
-    scrollToBottom();
-
-    // 4. Envia a mensagem para o seu backend
-    try {
-      const response = await fetch(backendUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: userText }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro na resposta do servidor.');
-      }
-
-      const data = await response.json();
-      const botText = data.reply;
-      
-      // 7. Adiciona a mensagem do bot à interface
-      createMessage(botText, "bot");
-
-    } catch (error) {
-      console.error("Erro ao contatar o backend:", error);
-      // 7b. Mostra uma mensagem de erro
-      createMessage("Desculpe, não consegui me conectar ao meu cérebro. Tente novamente.", "bot");
-    } finally {
-      // 6. Esconde o indicador "digitando" (sempre)
-      typingIndicator.style.display = "none";
-    }
-  }
-
-  // --- Adiciona os Event Listeners ---
-
-  // Envio do formulário (clique no botão ou Enter)
-  chatForm.addEventListener("submit", handleChatSubmit);
-
-  // Botão de limpar chat
-  clearChatBtn.addEventListener("click", () => {
-    messagesContainer.innerHTML = ""; // Limpa todas as mensagens
-  });
-
-  // Navegação (apenas alterna a classe 'active')
-  navButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      // Remove 'active' de todos os botões
-      document.querySelector(".nav-btn.active")?.classList.remove("active");
-      // Adiciona 'active' ao botão clicado
-      button.classList.add("active");
-      
-      // (No futuro, você pode adicionar lógica aqui para mudar o view, 
-      // por ex: mostrar/esconder o .chat-container vs .scrumban-container)
+async function sendToAPI(message) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message })
     });
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    
+    const data = await res.json();
+    return {
+      reply: data.reply || data.response || "Sem resposta no momento.",
+      credits: data.credits_remaining
+    };
+  } catch (e) {
+    console.error("Error sending message:", e);
+    throw e;
+  }
+}
+
+// ============================================
+// CHAT HANDLING
+// ============================================
+
+async function handleSend(raw) {
+  if (isProcessing) return;
+  
+  const text = (raw || inputEl.value || "").trim();
+  if (!text) return;
+  
+  isProcessing = true;
+  inputEl.disabled = true;
+  
+  // Push user message
+  const userMsg = { role: "user", text, ts: Date.now() };
+  history.push(userMsg);
+  saveHistory();
+  appendMessage(userMsg);
+  
+  // Clear input
+  inputEl.value = "";
+  
+  // Show typing
+  setTyping(true);
+  
+  // Small delay for better UX
+  await new Promise(r => setTimeout(r, 300));
+  
+  try {
+    // Call API
+    const response = await sendToAPI(text);
+    
+    // Hide typing
+    setTyping(false);
+    
+    // Add bot message
+    const botMsg = { role: "assistant", text: response.reply, ts: Date.now() };
+    history.push(botMsg);
+    saveHistory();
+    appendMessage(botMsg);
+    
+    // Update credits
+    if (response.credits !== undefined) {
+      creditsValueEl.textContent = response.credits;
+    } else {
+      fetchCredits();
+    }
+    
+  } catch (error) {
+    setTyping(false);
+    
+    const errorMsg = {
+      role: "assistant",
+      text: "⚠️ **Erro de Conexão**\n\nNão consegui conectar ao servidor Nebula. Verifique se o backend está rodando corretamente.\n\n**Detalhes:** " + error.message,
+      ts: Date.now()
+    };
+    
+    history.push(errorMsg);
+    saveHistory();
+    appendMessage(errorMsg);
+    
+    console.error("❌ Erro:", error);
+  } finally {
+    isProcessing = false;
+    inputEl.disabled = false;
+    inputEl.focus();
+  }
+}
+
+// ============================================
+// INITIALIZATION
+// ============================================
+
+function ensureWelcome() {
+  const hasSeen = history && history.length > 0;
+  if (!hasSeen) {
+    const welcome = {
+      role: "assistant",
+      text: "👋 **Olá! Eu sou a Nebula Agent v6.0**\n\nSou sua assistente inteligente especializada em:\n\n• 📝 **Geração de cenários Gherkin** para testes BDD\n• 🔍 **Análise de telas** e identificação de elementos\n• 🧪 **Sugestão de casos de teste** e estratégias\n• 📊 **Validação de funcionalidades** com BDD\n• 💡 **Consultoria** sobre testes e qualidade\n\n**Como posso ajudar você hoje?**\n\nTente pedir:\n- \"Gerar um cenário Gherkin para login\"\n- \"Analisar a tela de checkout\"\n- \"Que casos de teste devo criar?\"",
+      ts: Date.now()
+    };
+    history.push(welcome);
+    saveHistory();
+  }
+}
+
+function renderHistory() {
+  messagesEl.innerHTML = "";
+  for (const m of history) {
+    appendMessage(m);
+  }
+  scrollToBottom();
+}
+
+// ============================================
+// EVENT LISTENERS
+// ============================================
+
+formEl.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  await handleSend();
+});
+
+inputEl.addEventListener("keypress", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    handleSend();
+  }
+});
+
+clearLocalBtn.addEventListener("click", async () => {
+  if (confirm("Tem certeza que deseja limpar o histórico de conversa?")) {
+    // Clear local history
+    history = [];
+    saveHistory();
+    renderHistory();
+    
+    // Clear server history
+    try {
+      await fetch(`${API_BASE_URL}/clear-history`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+    } catch (e) {
+      console.error("Error clearing server history:", e);
+    }
+    
+    // Show welcome message again
+    ensureWelcome();
+    renderHistory();
+  }
+});
+
+// Navigation buttons
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    // Future: implement view switching
   });
+});
 
-  // Adiciona uma mensagem inicial do bot
-  setTimeout(() => {
-     createMessage("Olá! Eu sou a Nebula. Como posso ajudar você hoje?", "bot");
-  }, 500);
+// ============================================
+// INITIALIZE
+// ============================================
 
+document.addEventListener("DOMContentLoaded", () => {
+  loadHistory();
+  ensureWelcome();
+  renderHistory();
+  fetchCredits();
+  
+  // Focus input
+  inputEl.focus();
+  
+  console.log("✅ Nebula Agent v6.0 initialized");
 });

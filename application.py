@@ -52,13 +52,7 @@ if "default_user" not in billing_manager.users:
 
 @app.post("/chat")
 async def chat_endpoint(request: Request):
-    """Endpoint principal para processar mensagens do chat usando o Agente LLM."""
-    if not is_llm_available():
-        return JSONResponse(
-            {"reply": "⚠️ O Agente LLM não está disponível. Verifique a configuração da API Key."},
-            status_code=503
-        )
-
+    """Endpoint principal para processar mensagens do chat usando o Agente LLM ou ML fallback."""
     try:
         data = await request.json()
         message = data.get("message", "").strip()
@@ -72,14 +66,19 @@ async def chat_endpoint(request: Request):
         if not user:
             user = billing_manager.create_user(user_id, PlanType.LITE)
         
-        # Tentar realizar a ação (deduza créditos)
-        action_result = billing_manager.perform_action(user_id, ActionType.GENERATE_GHERKIN)
-        
-        if not action_result["success"]:
-            return JSONResponse({
-                "reply": f"⚠️ {action_result['message']}\n\nCréditos disponíveis: {action_result['credits_remaining']}",
-                "credits_remaining": action_result["credits_remaining"]
-            })
+        # Tentar realizar a ação (deduz créditos apenas se LLM estiver disponível)
+        # Se LLM não estiver disponível, usa ML fallback gratuito
+        if is_llm_available():
+            action_result = billing_manager.perform_action(user_id, ActionType.GENERATE_GHERKIN)
+            
+            if not action_result["success"]:
+                return JSONResponse({
+                    "reply": f"⚠️ {action_result['message']}\n\nCréditos disponíveis: {action_result['credits_remaining']}\n\n💡 **Dica:** Configure a OPENAI_API_KEY para usar o LLM completo, ou continue usando o modo ML gratuito.",
+                    "credits_remaining": action_result["credits_remaining"]
+                })
+        else:
+            # Modo fallback ML - não consome créditos
+            print("ℹ️ LLM não disponível, usando motor ML local (gratuito)")
 
         # Adiciona ao histórico
         STATE["conversation_history"].append({
@@ -88,7 +87,7 @@ async def chat_endpoint(request: Request):
             "timestamp": datetime.now().isoformat()
         })
 
-        # Processa a mensagem usando o Agente
+        # Processa a mensagem usando o Agente (funciona com LLM ou ML fallback)
         reply = process_as_agent(message, STATE)
 
         # Adiciona resposta ao histórico
@@ -109,13 +108,16 @@ async def chat_endpoint(request: Request):
         return JSONResponse({
             "reply": reply,
             "credits_remaining": user.credits,
-            "task_id": task_data["id"] if task_data else None
+            "task_id": task_data["id"] if task_data else None,
+            "llm_available": is_llm_available()
         })
 
     except Exception as e:
         print(f"❌ Erro no chat: {e}")
+        import traceback
+        traceback.print_exc()
         return JSONResponse(
-            {"reply": f"⚠️ Ocorreu um erro interno ao processar sua mensagem: {e}. Tente novamente."},
+            {"reply": f"⚠️ Ocorreu um erro interno ao processar sua mensagem.\n\n**Detalhes:** {str(e)}\n\nTente novamente ou verifique os logs do servidor."},
             status_code=500
         )
 
