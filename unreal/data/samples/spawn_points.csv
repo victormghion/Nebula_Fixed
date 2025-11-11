@@ -1,0 +1,7 @@
+X,Y,Z,SpawnTag
+0,0,0,pedestrian
+100,0,0,pedestrian
+0,100,0,pedestrian
+-100,0,0,pedestrian
+0,-100,0,pedestrian
+

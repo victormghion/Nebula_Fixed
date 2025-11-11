@@ -2,4 +2,9 @@ fastapi==0.104.1
 uvicorn==0.24.0
 python-multipart==0.0.6
 openai>=1.0.0
-
+pandas>=2.1.0
+osmnx==1.9.3
+geopandas==0.14.1
+shapely==2.0.2
+networkx==3.1
+pyproj==3.6.1

@@ -1,0 +1,12 @@
+{
+  "nodes": [
+    { "id": 0, "x": 0.0, "y": 0.0, "z": 0.0 },
+    { "id": 1, "x": 50.0, "y": 0.0, "z": 0.0 },
+    { "id": 2, "x": 50.0, "y": 50.0, "z": 0.0 }
+  ],
+  "edges": [
+    { "from": 0, "to": 1, "length_m": 50.0, "speed_kph": 40.0, "lanes": 2, "oneway": true },
+    { "from": 1, "to": 2, "length_m": 50.0, "speed_kph": 40.0, "lanes": 2, "oneway": false }
+  ]
+}
+

@@ -83,3 +83,31 @@ def get_real_screen_analysis(screenshot_path: str) -> str:
 
 O restante da arquitetura (LLM e Gherkin Generator) já está pronto para consumir essa nova entrada!
 
+## Pipeline de Dados para UE5 (São Caetano do Sul)
+
+Para iniciar seu mundo aberto no Unreal Engine 5 usando dados reais do ABC Paulista:
+
+1) Instale dependências de GIS:
+
+```bash
+pip install -r requirements.txt
+```
+
+2) Exporte dados OSM de São Caetano:
+
+```bash
+python tools/osm_export.py --place "São Caetano do Sul, São Paulo, Brazil" --output unreal_export --spawn-count 800
+```
+
+Saídas geradas em `unreal_export/`:
+- roads.geojson: malha viária (para instanciar splines/estradas).
+- buildings.geojson: footprints dos prédios (para geração procedural/Houdini/PCG).
+- lanes_graph.json: grafo simples de tráfego (nós/arestas, comprimento, velocidade, faixas).
+- spawn_points.csv: pontos para MassAI pedestres (DataTable).
+
+3) Importe no UE5:
+- Use World Partition e um nível vazio.
+- Converta GeoJSON para atores via plugins (ex.: RuntimeGeoJSON) ou pipeline próprio (Houdini Engine/PCG).
+- Converta `spawn_points.csv` em `PrimaryDataAsset`/DataTable e gere spawns para MassAI.
+
+Mais detalhes em `tools/README.md`.

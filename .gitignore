@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+.env
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (frontend subfolder)
+static/node_modules/
+static/package-lock.json
+
+# Logs
+*.log
+
+# Data exports / large generated assets
+unreal_export/
+tools/*.geojson
+tools/*.csv
+
+# Cache
+.cache/
+
+
